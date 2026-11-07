@@ -1,0 +1,16 @@
+{% extends "frontendapp/layout.html" %}
+{% block title %}Register{% endblock %}
+{% block content %}
+<div class="container mt-4">
+  <h1>Register an account</h1>
+  <p>Administrator access required.</p>
+  {% if message %}<p>{{ message }}</p>{% endif %}
+  <form method="post">
+    {% csrf_token %}
+    <p><label>Username <input name="username" required maxlength="150" autocomplete="username"></label></p>
+    <p><label>Password <input name="password" type="password" required autocomplete="new-password"></label></p>
+    <p><label>Role <select name="role"><option value="user">User</option><option value="admin">Admin</option><option value="none">No role</option></select></label></p>
+    <button class="btn btn-primary" type="submit">Register</button>
+  </form>
+</div>
+{% endblock %}

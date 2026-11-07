@@ -1,0 +1,80 @@
+services:
+  db:
+    image: postgres:17
+    environment:
+      POSTGRES_DB: delta
+      POSTGRES_USER: delta
+      POSTGRES_PASSWORD: password
+      PYTHONUNBUFFERED: "1"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U delta -d delta"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+
+  redis:
+    image: redis:7-alpine
+
+  api:
+    build: ./Backend
+    command: sh -c "python manage.py migrate --noinput && python manage.py runserver 0.0.0.0:8000"
+    volumes:
+      - ./Backend:/app
+    environment:
+      PYTHONUNBUFFERED: "1"
+      SECRET_KEY: secretkey
+      DEBUG: "True"
+      ALLOWED_HOSTS: api,localhost,127.0.0.1
+      DB_HOST: db
+      DB_PORT: "5432"
+      DB_NAME: delta
+      DB_USER: delta
+      DB_PASSWORD: password
+      CELERY_BROKER_URL: redis://redis:6379/0
+      CELERY_RESULT_BACKEND: redis://redis:6379/1
+    ports:
+      - "127.0.0.1:8001:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+
+  worker:
+    build: ./Backend
+    command: celery -A backend worker --loglevel=INFO --pool=solo
+    volumes:
+      - ./Backend:/app
+    environment:
+      PYTHONUNBUFFERED: "1"
+      DB_HOST: db
+      DB_PORT: "5432"
+      DB_NAME: delta
+      DB_USER: delta
+      DB_PASSWORD: password
+      CELERY_BROKER_URL: redis://redis:6379/0
+      CELERY_RESULT_BACKEND: redis://redis:6379/1
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+
+  frontend:
+    build: ./Frontend
+    command: sh -c "python manage.py migrate --noinput && python manage.py runserver 0.0.0.0:8000"
+    volumes:
+      - ./Frontend:/app
+    environment:
+      BACKEND_URL: http://api:8000
+      PYTHONUNBUFFERED: "1"
+    ports:
+      - "127.0.0.1:8000:8000"
+      - "127.0.0.1:${FRONTEND_PORT:-8080}:8000"
+    depends_on:
+      - api
+
+volumes:
+  postgres_data:

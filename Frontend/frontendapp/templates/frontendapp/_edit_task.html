@@ -1,0 +1,8 @@
+<form class="row align-items-center mb-2" hx-post="{% url 'update-task' task.id %}" hx-target="this" hx-swap="outerHTML">
+  {% csrf_token %}
+  <div class="col"><input class="form-control" name="body" value="{{ task.body }}" required aria-label="Task"></div>
+  <div class="col"><input class="form-control" name="description" value="{{ task.description }}" required aria-label="Description"></div>
+  <div class="col-auto"><label><input type="checkbox" name="is_complete" {% if task.is_complete %}checked{% endif %}> Complete</label></div>
+  <div class="col-auto"><button class="btn btn-success" type="submit">Save</button></div>
+  <div class="col-auto"><button class="btn btn-secondary" type="button" hx-get="{% url 'get-tasks' %}" hx-target="#tasks" hx-swap="innerHTML">Cancel</button></div>
+</form>

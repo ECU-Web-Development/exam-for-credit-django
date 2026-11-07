@@ -1,0 +1,32 @@
+{% extends "frontendapp/layout.html" %}
+{% block content %}
+<div class="container mt-4">
+<h1>Accounts and roles</h1>
+<a href="{% url 'register' %}">Create account</a>
+<p>{{ message }}</p>
+{% for user in users %}
+<form method="post" class="mb-2">
+  {% csrf_token %}
+  <input type="hidden" name="kind" value="users"><input type="hidden" name="id" value="{{ user.id }}">
+  {{ user.username }} — {{ user.role }}
+  <select name="role"><option value="user">User</option><option value="admin">Admin</option><option value="none">No role</option></select>
+  <button class="btn btn-primary" name="action" value="PATCH">Set role</button>
+  <button class="btn btn-primary" name="action" value="DELETE">Delete account</button>
+</form>
+{% endfor %}
+<h2>Roles</h2>
+<p>The built-in user and admin roles control application access. Additional groups grant no application access.</p>
+{% for role in roles %}
+<form method="post" class="mb-2">
+  {% csrf_token %}
+  <input type="hidden" name="kind" value="roles"><input type="hidden" name="id" value="{{ role.id }}">
+  <input name="name" value="{{ role.name }}" required>
+  <button class="btn btn-primary" name="action" value="PATCH">Rename</button><button class="btn btn-primary" name="action" value="DELETE">Delete</button>
+</form>
+{% endfor %}
+<form method="post">
+  {% csrf_token %}<input type="hidden" name="kind" value="roles">
+  <input name="name" placeholder="Group name" required><button class="btn btn-primary" name="action" value="POST">Create group</button>
+</form>
+</div>
+{% endblock %}
