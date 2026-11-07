@@ -23,6 +23,7 @@ def login(request):
                 json={"username": request.POST.get("username", "").strip(), "password": request.POST.get("password", ""),},
                 timeout=10,
             )
+            print(response.text)
             if response.status_code == 200:
                 tokens = response.json()
                 access, refresh = tokens["access"], tokens["refresh"]
