@@ -1,0 +1,20 @@
+{% extends "frontendapp/layout.html" %}
+
+{% block title %}Task{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+    <div class="row">
+        <div class="col-8">
+            <h2>Tasks</h2>
+            <div id="tasks" hx-get="{% url 'get-tasks' %}" hx-trigger="load, tasksChanged from:body" hx-swap="innerHTML">
+                <p>Loading tasks...</p>
+            </div>
+        </div>
+        <div class="col-4">
+            <h2>Notifications</h2>
+            <div hx-get="{% url 'notifications' %}" hx-trigger="load, every 3s" hx-swap="innerHTML"></div>
+        </div>
+    </div>
+</div>
+{% endblock %}

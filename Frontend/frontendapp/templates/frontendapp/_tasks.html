@@ -1,0 +1,34 @@
+<div class="container">
+  {% for task in tasks %}
+    <div class="row align-items-center mb-2" hx-target="closest .row" hx-swap="outerHTML">
+      <div class="col">{{ task.body }} | {{ task.is_complete }}</div>
+      <div class="col-auto">
+        <form method="post" hx-post="{% url 'delete-task' task.id %}" hx-confirm="Delete this task?">
+          {% csrf_token %}
+          <button class="btn btn-danger" type="submit">Delete</button>
+        </form>
+      </div>
+      <div class="col-auto">
+        <button class="btn btn-primary" hx-get="{% url 'edit-task' task.id %}">Edit</button>
+      </div>
+      <div class="col-12 mt-2">
+        {% for comment in task.comments %}
+          <p class="mb-1"><strong>{{ comment.author }}:</strong> {{ comment.message }}</p>
+        {% endfor %}
+        <form hx-post="{% url 'add-comment' task.id %}" hx-target="this" hx-swap="outerHTML">
+          {% csrf_token %}
+          <input name="message" placeholder="Add a comment" maxlength="500" required>
+          <button class="btn btn-sm btn-secondary">Comment</button>
+        </form>
+      </div>
+    </div>
+  {% empty %}
+    <p>No tasks yet.</p>
+  {% endfor %}
+  <form class="row mb-2" hx-post="{% url 'add-task' %}" hx-target="this" hx-swap="outerHTML">
+    {% csrf_token %}
+    <div class="col"><input class="form-control" name="body" placeholder="New task" required></div>
+    <div class="col"><input class="form-control" name="description" placeholder="Description" required></div>
+    <div class="col-auto"><button class="btn btn-primary">Add</button></div>
+  </form>
+</div>

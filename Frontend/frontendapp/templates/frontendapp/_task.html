@@ -1,0 +1,9 @@
+{% extends "frontendapp/layout.html" %}
+
+{% block title %}Task{% endblock %}
+
+{% block content %}
+<div id="tasks" hx-get="{% url 'get-tasks' %}" hx-trigger="load, tasksChanged from:body" hx-swap="innerHTML">
+  <p>Loading tasks...</p>
+</div>
+{% endblock %}
